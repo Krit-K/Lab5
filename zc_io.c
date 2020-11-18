@@ -144,7 +144,7 @@ char *zc_write_start(zc_file *file, size_t size)
     size_t temp = file->offset;
     file->offset += size;
     char *newPath;
-    newPath = file->path + temp;
+    newPath = file->dataPtr + temp;
 
     return newPath;
 }
