@@ -13,7 +13,7 @@ struct zc_file
 {
     off_t fileSize;
     void *dataPtr;
-    int *fd;
+    int *fdPtr;
     int offset;
 };
 
@@ -25,7 +25,6 @@ zc_file *zc_open(const char *path)
 {
     // To implement
     int fd;
-    // zc_file file;
     zc_file *filePtr = malloc(sizeof(zc_file));
     void *dataPtr;
 
@@ -35,7 +34,7 @@ zc_file *zc_open(const char *path)
     {
         return NULL;
     }
-    filePtr->fd = &fd;
+    filePtr->fdPtr = &fd;
 
     fstat(fd, &buf);
     off_t size = buf.st_size;
@@ -59,7 +58,7 @@ zc_file *zc_open(const char *path)
         };
     }
 
-    // file.dataPtr = dataPtr;
+    filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
     return filePtr;
@@ -72,17 +71,17 @@ int zc_close(zc_file *file)
     off_t size;
     int fd;
 
-    fd = file->fd;
+    fd = file->fdPtr;
     size = file->fileSize;
 
-    if (munmap(file, size) == -1)
+    if ((munmap(file, size)) == -1)
     {
         return -1;
     }
     else
     {
-        free(file->dataPtr);
-        if (close(fd) == -1)
+        free(file);
+        if (close(*(file->fdPtr)) == -1)
         {
             return -1;
         }
@@ -98,7 +97,7 @@ const char *zc_read_start(zc_file *file, size_t *size)
     size_t offset = 0;
 
     neededSize = *size;
-    offset += *size;
+    // offset += *size;
 
     char *tempPtr = (char *)(file->dataPtr);
     char *bytePtr;
@@ -112,7 +111,8 @@ const char *zc_read_start(zc_file *file, size_t *size)
     bytePtr = tempPtr + file->offset;
     file->offset += neededSize;
 
-    return NULL;
+    // return NULL;
+    return bytePtr;
 }
 
 void zc_read_end(zc_file *file)
