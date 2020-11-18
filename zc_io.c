@@ -45,7 +45,11 @@ zc_file *zc_open(const char *path)
 
     if (size == 0)
     {
-        filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, fd, 0);
+        if ((filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, fd, 0)) == MAP_FAILED)
+        {
+            perror("Error in mmap of newly created file");
+            exit(1);
+        }
         filePtr->fileSize = 1;
     }
     else
@@ -132,13 +136,17 @@ char *zc_write_start(zc_file *file, size_t size)
     size_t left = file->fileSize - file->offset;
     if (left < size)
     {
-        file->path = mremap(file->path, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
+        file->dataPtr = mremap(file->dataPtr, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
         file->fileSize = size + file->offset;
         ftruncate(file->fileSize, size + file->offset);
     }
+
     size_t temp = file->offset;
     file->offset += size;
-    return file->path + temp;
+    char *newPath;
+    newPath = file->path + temp;
+
+    return newPath;
 }
 
 void zc_write_end(zc_file *file)
