@@ -13,7 +13,7 @@ struct zc_file
 {
     off_t fileSize;
     void *dataPtr;
-    int *fdPtr;
+    int fd;
     int offset;
     char *path;
     pthread_mutex_t mutex;
@@ -33,19 +33,19 @@ zc_file *zc_open(const char *path)
 
     struct stat buf;
 
-    if ((fd = open(path, O_RDWR | O_CREAT)) == -1)
+    if ((filePtr->fd = open(path, O_RDWR | O_CREAT)) == -1)
     {
         return NULL;
     }
-    filePtr->fdPtr = &fd;
+    // filePtr->fdPtr = &fd;
 
-    fstat(fd, &buf);
+    fstat(filePtr->fd, &buf);
     off_t size = buf.st_size;
     filePtr->fileSize = size;
 
     if (size == 0)
     {
-        if ((filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, fd, 0)) == MAP_FAILED)
+        if ((filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
         {
             perror("Error in mmap of newly created file");
             exit(1);
@@ -54,7 +54,7 @@ zc_file *zc_open(const char *path)
     }
     else
     {
-        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED)
+        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, filtePtr->fd, 0)) == MAP_FAILED)
         {
             perror("Error in mmap of a file");
             exit(1);
@@ -74,7 +74,7 @@ int zc_close(zc_file *file)
     off_t size;
     int fd;
 
-    fd = file->fdPtr;
+    fd = file->fd;
     size = file->fileSize;
 
     if ((munmap(file, size)) == -1)
@@ -84,7 +84,7 @@ int zc_close(zc_file *file)
     else
     {
         free(file);
-        if (close(*(file->fdPtr)) == -1)
+        if (close(file->fd) == -1)
         {
             return -1;
         }
@@ -138,7 +138,7 @@ char *zc_write_start(zc_file *file, size_t size)
     {
         file->dataPtr = mremap(file->dataPtr, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
         file->fileSize = size + file->offset;
-        ftruncate(file->fileSize, size + file->offset);
+        ftruncate(file->fd, size + file->offset);
     }
 
     size_t temp = file->offset;
