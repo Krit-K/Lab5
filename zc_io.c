@@ -1,5 +1,5 @@
+#define _GNU_SOURCE
 #include "zc_io.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -15,6 +15,9 @@ struct zc_file
     void *dataPtr;
     int *fdPtr;
     int offset;
+    char *path;
+    pthread_mutex_t mutex;
+    pthread_mutex_t wrt;
 };
 
 /**************
@@ -125,13 +128,22 @@ void zc_read_end(zc_file *file)
 
 char *zc_write_start(zc_file *file, size_t size)
 {
-    // To implement
-    return NULL;
+    pthread_mutex_lock(&(file->wrt));
+    size_t left = file->fileSize - file->offset;
+    if (left < size)
+    {
+        file->path = mremap(file->path, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
+        file->fileSize = size + file->offset;
+        ftruncate(file->fileSize, size + file->offset);
+    }
+    size_t temp = file->offset;
+    file->offset += size;
+    return file->path + temp;
 }
 
 void zc_write_end(zc_file *file)
 {
-    // To implement
+    pthread_mutex_unlock(&(file->wrt));
 }
 
 /**************
