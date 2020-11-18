@@ -42,11 +42,12 @@ zc_file *zc_open(const char *path)
 
     if (size == 0)
     {
-        if ((dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED)
-        {
-            perror("Error in mmap of newly created file");
-            exit(1);
-        };
+        // if ((dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED)
+        // {
+        //     perror("Error in mmap of newly created file");
+        //     exit(1);
+        // };
+        filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, fd, 0);
         filePtr->fileSize = 1;
     }
     else
