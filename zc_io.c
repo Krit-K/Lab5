@@ -30,7 +30,7 @@ zc_file *zc_open(const char *path)
 
     struct stat buf;
 
-    if ((fd = open(path, O_RDWR | O_CREAT) == -1))
+    if ((fd = open(path, O_RDWR | O_CREAT)) == -1)
     {
         return NULL;
     }
