@@ -54,7 +54,7 @@ zc_file *zc_open(const char *path)
     }
     else
     {
-        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, filtePtr->fd, 0)) == MAP_FAILED)
+        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
         {
             perror("Error in mmap of a file");
             exit(1);
