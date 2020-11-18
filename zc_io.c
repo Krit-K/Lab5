@@ -104,9 +104,9 @@ const char *zc_read_start(zc_file *file, size_t *size)
     int currentSpace = file->fileSize - file->offset;
     if (currentSpace < neededSize)
     {
-        neededSize = *size;
-        neededSize = file->fileSize - file->offset;
-        neededSize = neededSize;
+        newSize = *size;
+        newSize = file->fileSize - file->offset;
+        neededSize = newSize;
     }
 
     bytePtr = tempPtr + file->offset;
