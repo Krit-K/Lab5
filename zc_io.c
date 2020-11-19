@@ -28,9 +28,10 @@ zc_file *zc_open(const char *path)
 {
     // To implement
     int fd;
-    zc_file *filePtr = malloc(sizeof(zc_file));
+    int info;
     char *dataPtr;
 
+    zc_file *filePtr = malloc(sizeof(zc_file));
     struct stat buf;
 
     if ((filePtr->fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
@@ -39,7 +40,11 @@ zc_file *zc_open(const char *path)
     }
     // filePtr->fdPtr = &fd;
 
-    fstat(filePtr->fd, &buf);
+    if ((info = fstat(filePtr->fd, &buf)) == -1)
+    {
+        perror("Error in fstat");
+        exit(1);
+    };
     off_t size = buf.st_size;
     filePtr->fileSize = size;
 
@@ -103,7 +108,8 @@ const char *zc_read_start(zc_file *file, size_t *size)
 
     // offset += *size;
 
-    char *tempPtr = (char *)(file->dataPtr);
+    // char *tempPtr = (char *)(file->dataPtr);
+
     char *bytePtr;
 
     neededSize = *size;
@@ -116,6 +122,7 @@ const char *zc_read_start(zc_file *file, size_t *size)
         neededSize = *size;
     }
 
+    char *tempPtr = file->dataPtr;
     bytePtr = tempPtr + file->offset;
     file->offset += neededSize;
 
@@ -135,8 +142,8 @@ void zc_read_end(zc_file *file)
 char *zc_write_start(zc_file *file, size_t size)
 {
     pthread_mutex_lock(&(file->wrt));
-    size_t left = file->fileSize - file->offset;
-    if (left < size)
+    size_t leftSpace = file->fileSize - file->offset;
+    if (leftSpace < size)
     {
         file->dataPtr = mremap(file->dataPtr, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
         file->fileSize = size + file->offset;
@@ -144,9 +151,9 @@ char *zc_write_start(zc_file *file, size_t size)
     }
 
     size_t temp = file->offset;
-    file->offset += size;
     char *newPath;
     newPath = file->dataPtr + temp;
+    file->offset += size;
 
     return newPath;
 }
