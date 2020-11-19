@@ -173,7 +173,30 @@ void zc_write_end(zc_file *file)
 off_t zc_lseek(zc_file *file, long offset, int whence)
 {
     // To implement
-    return -1;
+    off_t netOffset;
+    switch (whence)
+    {
+    case 0:
+        netOffset = offset;
+        break;
+    case 1:
+        netOffset = file->offset + offset;
+        break;
+    case 2:
+        netOffset = file->fileSize + offset;
+        break;
+    }
+
+    if (netOffset >= 0)
+    {
+        file->offset = netOffset;
+    }
+    else
+    // when there is error
+    {
+        return (off_t)-1;
+    }
+    return netOffset;
 }
 
 /**************
