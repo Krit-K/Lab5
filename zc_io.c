@@ -161,6 +161,7 @@ char *zc_write_start(zc_file *file, size_t size)
 void zc_write_end(zc_file *file)
 {
     pthread_mutex_unlock(&(file->wrt));
+    msync(file->dataPtr, file->fileSize, MS_SYNC);
 }
 
 /**************
