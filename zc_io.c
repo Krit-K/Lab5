@@ -29,7 +29,7 @@ zc_file *zc_open(const char *path)
     // // To implement
     int fd;
     int info;
-    char *dataPtr;
+    // char *dataPtr;
 
     zc_file *filePtr = malloc(sizeof(zc_file));
     struct stat buf;
@@ -46,7 +46,7 @@ zc_file *zc_open(const char *path)
         exit(1);
     };
     off_t size = buf.st_size;
-    filePtr->fileSize = size;
+    // filePtr->fileSize = size;
 
     if (size == 0)
     {
@@ -64,9 +64,10 @@ zc_file *zc_open(const char *path)
             perror("Error in mmap of a file");
             exit(1);
         };
+        filePtr->fileSize = size;
     }
 
-    filePtr->dataPtr = dataPtr;
+    // filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
     return filePtr;
