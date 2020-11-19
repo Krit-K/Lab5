@@ -150,6 +150,17 @@ char *zc_write_start(zc_file *file, size_t size)
         file->dataPtr = mremap(file->dataPtr, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
         file->fileSize = size + file->offset;
         ftruncate(file->fd, size + file->offset);
+        if (file->offset > file->fileSize)
+        {
+            off_t maxSize = file->offset - file->fileSize;
+            int i = 1;
+            while (i <= maxSize)
+            {
+                // checks for condition of null byte
+                *(file->dataPtr + file->offset - i) == '\0';
+                i++;
+            }
+        }
     }
 
     off_t temp = file->offset;
@@ -173,30 +184,30 @@ void zc_write_end(zc_file *file)
 off_t zc_lseek(zc_file *file, long offset, int whence)
 {
     // To implement
-    off_t netOffset;
+    off_t totalOffset;
     switch (whence)
     {
     case 0:
-        netOffset = offset;
+        totalOffset = offset;
         break;
     case 1:
-        netOffset = file->offset + offset;
+        totalOffset = offset + file->offset;
         break;
     case 2:
-        netOffset = file->fileSize + offset;
+        totalOffset = offset + file->fileSize;
         break;
     }
 
-    if (netOffset >= 0)
+    if (totalOffset >= 0)
     {
-        file->offset = netOffset;
+        file->offset = totalOffset;
     }
     else
     // when there is error
     {
         return (off_t)-1;
     }
-    return netOffset;
+    return totalOffset;
 }
 
 /**************
