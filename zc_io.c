@@ -19,6 +19,7 @@ struct zc_file
     char *path;
     pthread_mutex_t mutex;
     pthread_mutex_t wrt;
+    pthread_rwlock_t lock;
 };
 
 /**************
@@ -73,6 +74,7 @@ zc_file *zc_open(const char *path)
 
     // pthread_rwlock_init(&(filePtr->wrt), NULL);
     pthread_mutex_init(&(filePtr->wrt), NULL);
+    pthread_rwlock_init(&(filePtr->lock), NULL);
     return filePtr;
 }
 
@@ -96,6 +98,7 @@ int zc_close(zc_file *file)
     {
         free(file);
         pthread_mutex_destroy(&(file->wrt));
+        pthread_rwlock_destroy(&(file->lock));
         // pthread_rwlock_destroy(&(file->wrt));
         if (close(file->fd) == -1)
         {
@@ -108,6 +111,7 @@ int zc_close(zc_file *file)
 const char *zc_read_start(zc_file *file, size_t *size)
 {
     pthread_mutex_lock(&(file->wrt));
+    pthread_rwlock_rdlock(&(file->lock));
     // To implement
     off_t neededSize;
     size_t newSize;
@@ -142,6 +146,7 @@ void zc_read_end(zc_file *file)
 {
     // To implement
     pthread_mutex_unlock(&(file->wrt));
+    pthread_rwlock_unlock(&(file->lock));
 }
 
 /**************
@@ -151,6 +156,7 @@ void zc_read_end(zc_file *file)
 char *zc_write_start(zc_file *file, size_t size)
 {
     pthread_mutex_lock(&(file->wrt));
+    pthread_rwlock_wrlock(&(file->lock));
     off_t leftSpace = file->fileSize - file->offset;
     if (leftSpace < size)
     {
@@ -182,6 +188,7 @@ void zc_write_end(zc_file *file)
 {
     msync(file->dataPtr, file->fileSize, MS_SYNC);
     pthread_mutex_unlock(&(file->wrt));
+    pthread_rwlock_unlock(&(file->lock));
 }
 
 /**************
@@ -192,6 +199,7 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
 {
     // To implement
     pthread_mutex_lock(&(file->wrt));
+    pthread_rwlock_wrlock(&(file->lock));
     off_t totalOffset;
     switch (whence)
     {
@@ -217,6 +225,7 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
     }
 
     pthread_mutex_unlock(&(file->wrt));
+    pthread_rwlock_unlock(&(file->lock));
     return totalOffset;
 }
 
