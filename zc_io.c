@@ -141,8 +141,8 @@ void zc_read_end(zc_file *file)
 
 char *zc_write_start(zc_file *file, size_t size)
 {
-    pthread_mutex_lock(&(file->wrt));
-    size_t leftSpace = file->fileSize - file->offset;
+    // pthread_mutex_lock(&(file->wrt));
+    off_t leftSpace = file->fileSize - file->offset;
     if (leftSpace < size)
     {
         file->dataPtr = mremap(file->dataPtr, file->fileSize, size + file->offset, MREMAP_MAYMOVE);
@@ -150,7 +150,7 @@ char *zc_write_start(zc_file *file, size_t size)
         ftruncate(file->fd, size + file->offset);
     }
 
-    size_t temp = file->offset;
+    int temp = file->offset;
     char *newPath;
     newPath = file->dataPtr + temp;
     file->offset += size;
@@ -160,7 +160,7 @@ char *zc_write_start(zc_file *file, size_t size)
 
 void zc_write_end(zc_file *file)
 {
-    pthread_mutex_unlock(&(file->wrt));
+    // pthread_mutex_unlock(&(file->wrt));
     msync(file->dataPtr, file->fileSize, MS_SYNC);
 }
 
