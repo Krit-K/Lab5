@@ -294,7 +294,7 @@ int zc_copyfile(const char *source, const char *dest)
     {
         return -1;
     }
-    size_t val = copy_file_range(srcPtr->fd, NULL, destPtr->fd, NULL, srcPtr->size, 0);
+    size_t val = copy_file_range(srcPtr->fd, NULL, destPtr->fd, NULL, srcPtr->fileSize, 0);
 
     zc_close(srcPtr);
     zc_close(destPtr);
