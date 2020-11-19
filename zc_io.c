@@ -252,17 +252,9 @@ int zc_copyfile(const char *source, const char *dest)
     //     exit(1);
     // }
 
-    if (sourcePtr == NULL)
+    if (sourcePtr == NULL || destPtr == NULL)
     {
         return -1;
-    }
-    else
-    {
-
-        if (destPtr == NULL)
-        {
-            return -1;
-        }
     }
 
     // if (zc_close(sourcePtr) == -1)
