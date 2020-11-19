@@ -12,7 +12,7 @@
 struct zc_file
 {
     off_t fileSize;
-    void *dataPtr;
+    char *dataPtr;
     int fd;
     int offset;
     char *path;
@@ -29,7 +29,7 @@ zc_file *zc_open(const char *path)
     // To implement
     int fd;
     zc_file *filePtr = malloc(sizeof(zc_file));
-    void *dataPtr;
+    char *dataPtr;
 
     struct stat buf;
 
@@ -73,11 +73,13 @@ int zc_close(zc_file *file)
 
     off_t size;
     int fd;
+    char *data;
 
     fd = file->fd;
+    data = file->dataPtr;
     size = file->fileSize;
 
-    if ((munmap(file, size)) == -1)
+    if ((munmap(data, size)) == -1)
     {
         return -1;
     }
