@@ -278,7 +278,8 @@ int zc_copyfile(const char *source, const char *dest)
         exit(1);
     };
 
-    if ((result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0)) == -1)
+    result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0);
+    if (result == -1)
     {
         return -1;
     }
