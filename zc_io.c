@@ -143,7 +143,7 @@ void zc_read_end(zc_file *file)
 
 char *zc_write_start(zc_file *file, size_t size)
 {
-    // pthread_mutex_lock(&(file->wrt));
+    pthread_mutex_lock(&(file->wrt));
     off_t leftSpace = file->fileSize - file->offset;
     if (leftSpace < size)
     {
@@ -162,8 +162,8 @@ char *zc_write_start(zc_file *file, size_t size)
 
 void zc_write_end(zc_file *file)
 {
-    // pthread_mutex_unlock(&(file->wrt));
-    msync(file->dataPtr, file->fileSize, MS_SYNC);
+    pthread_mutex_unlock(&(file->wrt));
+    // msync(file->dataPtr, file->fileSize, MS_SYNC);
 }
 
 /**************
