@@ -17,7 +17,6 @@ struct zc_file
     int fd;
     off_t offset;
     char *path;
-    pthread_mutex_t mutex;
     pthread_mutex_t wrt;
     pthread_rwlock_t lock;
 };
