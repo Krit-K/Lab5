@@ -102,6 +102,7 @@ int zc_close(zc_file *file)
 
 const char *zc_read_start(zc_file *file, size_t *size)
 {
+    pthread_mutex_lock(&(file->wrt));
     // To implement
     off_t neededSize;
     size_t newSize;
@@ -135,6 +136,7 @@ const char *zc_read_start(zc_file *file, size_t *size)
 void zc_read_end(zc_file *file)
 {
     // To implement
+    pthread_mutex_unlock(&(file->wrt));
 }
 
 /**************
