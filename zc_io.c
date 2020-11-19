@@ -14,7 +14,7 @@ struct zc_file
     off_t fileSize;
     char *dataPtr;
     int fd;
-    int offset;
+    off_t offset;
     char *path;
     pthread_mutex_t mutex;
     pthread_mutex_t wrt;
@@ -102,9 +102,9 @@ int zc_close(zc_file *file)
 const char *zc_read_start(zc_file *file, size_t *size)
 {
     // To implement
-    size_t neededSize;
+    off_t neededSize;
     size_t newSize;
-    size_t offset = 0;
+    // size_t offset = 0;
 
     // offset += *size;
 
@@ -114,7 +114,7 @@ const char *zc_read_start(zc_file *file, size_t *size)
 
     neededSize = *size;
 
-    int currentSpace = file->fileSize - file->offset;
+    off_t currentSpace = file->fileSize - file->offset;
     if (currentSpace < neededSize)
     {
         //neededSize = *size;
@@ -124,6 +124,7 @@ const char *zc_read_start(zc_file *file, size_t *size)
 
     char *tempPtr = file->dataPtr;
     bytePtr = tempPtr + file->offset;
+
     file->offset += neededSize;
 
     // return NULL;
@@ -150,7 +151,7 @@ char *zc_write_start(zc_file *file, size_t size)
         ftruncate(file->fd, size + file->offset);
     }
 
-    int temp = file->offset;
+    off_t temp = file->offset;
     char *newPath;
     newPath = file->dataPtr + temp;
     file->offset += size;
