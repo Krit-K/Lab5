@@ -26,47 +26,76 @@ struct zc_file
 
 zc_file *zc_open(const char *path)
 {
-    // To implement
-    int fd;
-    int info;
-    char *dataPtr;
+    // // To implement
+    // int fd;
+    // int info;
+    // char *dataPtr;
 
+    // zc_file *filePtr = malloc(sizeof(zc_file));
+    // struct stat buf;
+
+    // if ((filePtr->fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
+    // {
+    //     return NULL;
+    // }
+    // // filePtr->fdPtr = &fd;
+
+    // if ((info = fstat(filePtr->fd, &buf)) == -1)
+    // {
+    //     perror("Error in fstat");
+    //     exit(1);
+    // };
+    // off_t size = buf.st_size;
+    // filePtr->fileSize = size;
+
+    // if (size == 0)
+    // {
+    //     if ((filePtr->dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
+    //     {
+    //         perror("Error in mmap of newly created file");
+    //         exit(1);
+    //     }
+    //     filePtr->fileSize = 1;
+    // }
+    // else
+    // {
+    //     if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
+    //     {
+    //         perror("Error in mmap of a file");
+    //         exit(1);
+    //     };
+    // }
+
+    // filePtr->dataPtr = dataPtr;
+    // filePtr->offset = 0;
+
+    // return filePtr;
+    off_t size;
+    struct stat st;
     zc_file *filePtr = malloc(sizeof(zc_file));
-    struct stat buf;
 
-    if ((filePtr->fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
+    filePtr->fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+
+    if (filePtr->fd == -1)
     {
         return NULL;
     }
-    // filePtr->fdPtr = &fd;
-
-    if ((info = fstat(filePtr->fd, &buf)) == -1)
+    else
     {
-        perror("Error in fstat");
-        exit(1);
-    };
-    off_t size = buf.st_size;
-    filePtr->fileSize = size;
+        fstat(filePtr->fd, &st);
+        size = st.st_size;
+    }
 
     if (size == 0)
     {
-        if ((filePtr->dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
-        {
-            perror("Error in mmap of newly created file");
-            exit(1);
-        }
+        filePtr->dataPtr = mmap(NULL, 1, PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0);
         filePtr->fileSize = 1;
     }
     else
     {
-        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
-        {
-            perror("Error in mmap of a file");
-            exit(1);
-        };
+        filePtr->dataPtr = mmap(NULL, size, PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0);
+        filePtr->fileSize = size;
     }
-
-    filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
     return filePtr;
