@@ -236,42 +236,43 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
 int zc_copyfile(const char *source, const char *dest)
 {
     // To implement
-    zc_file *sourcePtr = zc_open(source);
-    zc_file *destPtr = zc_open(dest);
+    zc_file *sourcePtr; // = zc_open(source);
+    zc_file *destPtr;   // = zc_open(dest);
     size_t result;
 
-    // if ((sourcePtr = zc_open(source)) == NULL)
-    // {
-    //     perror("Error in zc_open of sourcePtr");
-    //     exit(1);
-    // }
+    if ((sourcePtr = zc_open(source)) == NULL)
+    {
+        perror("Error in zc_open of sourcePtr");
+        exit(1);
+    }
 
-    // if ((destPtr = zc_open(dest)) == NULL)
-    // {
-    //     perror("Error in zc_open of sourcePtr");
-    //     exit(1);
-    // }
+    if ((destPtr = zc_open(dest)) == NULL)
+    {
+        perror("Error in zc_open of sourcePtr");
+        exit(1);
+    }
 
     if (sourcePtr == NULL || destPtr == NULL)
     {
         return -1;
     }
 
-    // if (zc_close(sourcePtr) == -1)
-    // {
-    //     perror("Error in zc_close of sourcePtr");
-    //     exit(1);
-    // };
-
-    // if (zc_close(destPtr) == -1)
-    // {
-    //     perror("Error in zc_close of destPtr");
-    //     exit(1);
-    // };
-    zc_close(sourcePtr);
-    zc_close(destPtr);
-
     result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0);
+
+    if (zc_close(sourcePtr) == -1)
+    {
+        perror("Error in zc_close of sourcePtr");
+        exit(1);
+    };
+
+    if (zc_close(destPtr) == -1)
+    {
+        perror("Error in zc_close of destPtr");
+        exit(1);
+    };
+    // zc_close(sourcePtr);
+    // zc_close(destPtr);
+
     if (result == -1)
     {
         return -1;
