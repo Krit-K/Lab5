@@ -237,21 +237,21 @@ int zc_copyfile(const char *source, const char *dest)
 {
     // To implement
     // To implement
-    zc_file *sourcePtr;
-    zc_file *destPtr;
+    zc_file *sourcePtr = zc_open(source);
+    zc_file *destPtr = zc_open(dest);
     size_t result;
 
-    if ((sourcePtr = zc_open(source)) == NULL)
-    {
-        perror("Error in zc_open of sourcePtr");
-        exit(1);
-    }
+    // if ((sourcePtr = zc_open(source)) == NULL)
+    // {
+    //     perror("Error in zc_open of sourcePtr");
+    //     exit(1);
+    // }
 
-    if ((destPtr = zc_open(dest)) == NULL)
-    {
-        perror("Error in zc_open of sourcePtr");
-        exit(1);
-    }
+    // if ((destPtr = zc_open(dest)) == NULL)
+    // {
+    //     perror("Error in zc_open of sourcePtr");
+    //     exit(1);
+    // }
 
     if (sourcePtr == NULL)
     {
