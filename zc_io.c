@@ -18,7 +18,7 @@ struct zc_file
     off_t offset;
     char *path;
     pthread_mutex_t mutex;
-    pthread_rwlock_t wrt;
+    pthread_mutex_t wrt;
 };
 
 /**************
@@ -71,8 +71,8 @@ zc_file *zc_open(const char *path)
     // filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
-    pthread_rwlock_init(&(filePtr->wrt), NULL);
-    // pthread_mutex_lock(&(filePtr->wrt));
+    // pthread_rwlock_init(&(filePtr->wrt), NULL);
+    pthread_mutex_init(&(filePtr->wrt), NULL);
     return filePtr;
 }
 
@@ -96,7 +96,7 @@ int zc_close(zc_file *file)
     {
         free(file);
         pthread_mutex_destroy(&(file->wrt));
-        pthread_rwlock_destroy(&(file->wrt));
+        // pthread_rwlock_destroy(&(file->wrt));
         if (close(file->fd) == -1)
         {
             return -1;
