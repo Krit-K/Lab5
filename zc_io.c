@@ -236,5 +236,51 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
 int zc_copyfile(const char *source, const char *dest)
 {
     // To implement
-    return -1;
+    // To implement
+    zc_file *sourcePtr;
+    zc_file *destPtr;
+    size_t result;
+
+    if ((sourcePtr = zc_open(source)) == NULL)
+    {
+        perror("Error in zc_open of sourcePtr");
+        exit(1);
+    }
+
+    if ((destPtr = zc_open(dest)) == NULL)
+    {
+        perror("Error in zc_open of sourcePtr");
+        exit(1);
+    }
+
+    if (sourcePtr == NULL)
+    {
+        return -1;
+    }
+
+    if (destPtr == NULL)
+    {
+        return -1;
+    }
+
+    if (zc_close(sourcePtr) == -1)
+    {
+        perror("Error in zc_close of sourcePtr");
+        exit(1);
+    };
+
+    if (zc_close(destPtr) == -1)
+    {
+        perror("Error in zc_close of destPtr");
+        exit(1);
+    };
+
+    if ((result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0)) == -1)
+    {
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
 }
