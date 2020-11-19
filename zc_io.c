@@ -237,49 +237,69 @@ int zc_copyfile(const char *source, const char *dest)
 {
     // To implement
     // To implement
-    zc_file *sourcePtr = zc_open(source);
+    // zc_file *sourcePtr = zc_open(source);
+    // zc_file *destPtr = zc_open(dest);
+    // size_t result;
+
+    // // if ((sourcePtr = zc_open(source)) == NULL)
+    // // {
+    // //     perror("Error in zc_open of sourcePtr");
+    // //     exit(1);
+    // // }
+
+    // // if ((destPtr = zc_open(dest)) == NULL)
+    // // {
+    // //     perror("Error in zc_open of sourcePtr");
+    // //     exit(1);
+    // // }
+
+    // if (sourcePtr == NULL)
+    // {
+    //     return -1;
+    // }
+    // else
+    // {
+
+    //     if (destPtr == NULL)
+    //     {
+    //         return -1;
+    //     }
+    // }
+
+    // if (zc_close(sourcePtr) == -1)
+    // {
+    //     perror("Error in zc_close of sourcePtr");
+    //     exit(1);
+    // };
+
+    // if (zc_close(destPtr) == -1)
+    // {
+    //     perror("Error in zc_close of destPtr");
+    //     exit(1);
+    // };
+
+    // result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0);
+    // if (result == -1)
+    // {
+    //     return -1;
+    // }
+    // else
+    // {
+    //     return 0;
+    // }
+    zc_file *srcPtr = zc_open(source);
     zc_file *destPtr = zc_open(dest);
-    size_t result;
 
-    // if ((sourcePtr = zc_open(source)) == NULL)
-    // {
-    //     perror("Error in zc_open of sourcePtr");
-    //     exit(1);
-    // }
-
-    // if ((destPtr = zc_open(dest)) == NULL)
-    // {
-    //     perror("Error in zc_open of sourcePtr");
-    //     exit(1);
-    // }
-
-    if (sourcePtr == NULL)
+    if (srcPtr == NULL || destPtr == NULL)
     {
         return -1;
     }
-    else
-    {
+    size_t val = copy_file_range(srcPtr->fd, NULL, destPtr->fd, NULL, srcPtr->size, 0);
 
-        if (destPtr == NULL)
-        {
-            return -1;
-        }
-    }
+    zc_close(srcPtr);
+    zc_close(destPtr);
 
-    if (zc_close(sourcePtr) == -1)
-    {
-        perror("Error in zc_close of sourcePtr");
-        exit(1);
-    };
-
-    if (zc_close(destPtr) == -1)
-    {
-        perror("Error in zc_close of destPtr");
-        exit(1);
-    };
-
-    result = copy_file_range(sourcePtr->fd, NULL, destPtr->fd, NULL, sourcePtr->fileSize, 0);
-    if (result == -1)
+    if (val == -1)
     {
         return -1;
     }
