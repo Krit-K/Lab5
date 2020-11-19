@@ -70,6 +70,8 @@ zc_file *zc_open(const char *path)
     // filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
+    // pthread_mutex_unlock(&(filePtr->wrt), NULL);
+    pthread_mutex_lock(&(filePtr->wrt));
     return filePtr;
 }
 
@@ -92,6 +94,7 @@ int zc_close(zc_file *file)
     else
     {
         free(file);
+        pthread_mutex_destroy(&(file->wrt));
         if (close(file->fd) == -1)
         {
             return -1;
@@ -175,8 +178,8 @@ char *zc_write_start(zc_file *file, size_t size)
 
 void zc_write_end(zc_file *file)
 {
+    msync(file->dataPtr, file->fileSize, MS_SYNC);
     pthread_mutex_unlock(&(file->wrt));
-    // msync(file->dataPtr, file->fileSize, MS_SYNC);
 }
 
 /**************
@@ -186,6 +189,7 @@ void zc_write_end(zc_file *file)
 off_t zc_lseek(zc_file *file, long offset, int whence)
 {
     // To implement
+    pthread_mutex_lock(&(file->wrt));
     off_t totalOffset;
     switch (whence)
     {
@@ -205,10 +209,12 @@ off_t zc_lseek(zc_file *file, long offset, int whence)
         file->offset = totalOffset;
     }
     else
-    // when there is error
+    // when there is an error
     {
         return (off_t)-1;
     }
+
+    pthread_mutex_unlock(&(file->wrt));
     return totalOffset;
 }
 
