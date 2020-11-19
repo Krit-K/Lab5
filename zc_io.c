@@ -27,14 +27,14 @@ struct zc_file
 zc_file *zc_open(const char *path)
 {
     // // To implement
-    int fd;
+    // int fd;
     int info;
-    char *dataPtr;
+    // char *dataPtr;
 
     zc_file *filePtr = malloc(sizeof(zc_file));
     struct stat buf;
 
-    if ((fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
+    if ((filePtr->fd = open(path, O_RDWR | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
     {
         return NULL;
     }
@@ -50,7 +50,7 @@ zc_file *zc_open(const char *path)
 
     if (size == 0)
     {
-        if ((dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
+        if ((filePtr->dataPtr = mmap(NULL, 1, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
         {
             perror("Error in mmap of newly created file");
             exit(1);
@@ -59,7 +59,7 @@ zc_file *zc_open(const char *path)
     }
     else
     {
-        if ((dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
+        if ((filePtr->dataPtr = mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, filePtr->fd, 0)) == MAP_FAILED)
         {
             perror("Error in mmap of a file");
             exit(1);
@@ -67,8 +67,7 @@ zc_file *zc_open(const char *path)
         filePtr->fileSize = size;
     }
 
-    filePtr->fd = fd;
-    filePtr->dataPtr = dataPtr;
+    // filePtr->dataPtr = dataPtr;
     filePtr->offset = 0;
 
     return filePtr;
