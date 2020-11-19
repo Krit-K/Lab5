@@ -278,7 +278,7 @@ int zc_copyfile(const char *source, const char *dest)
         exit(1);
     };
 
-    if (result == -1)
+    if ((int)result == -1)
     {
         return -1;
     }
